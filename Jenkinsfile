@@ -5,7 +5,7 @@ pipeline {
 
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/catboy16669/Assignment-3-Midterm-Project.git'
+                        git branch: 'main', url: 'https://github.com/catboy16669/Assignment-3-Midterm-Project.git'
             }
         }
 
