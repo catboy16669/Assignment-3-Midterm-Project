@@ -1,49 +1,53 @@
 pipeline {
     agent any
+
     stages {
+
         stage('Clone Repository') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/catboy16669/Assignment-3-Midterm-Project.git'
+                git 'https://github.com/catboy16669/Assignment-3-Midterm-Project.git'
             }
         }
+
         stage('Install Dependencies') {
             steps {
-                dir('foodexpress-backend') {
-                    sh 'npm install'
-                }
+                // Run npm install in the root folder where package.json is
+                sh 'npm install'
             }
         }
+
         stage('Run Tests') {
             steps {
-                dir('foodexpress-backend') {
-                    sh 'echo "Tests passed - no test framework configured yet"'
-                }
+                // If you have no test framework, just echo
+                sh 'echo Tests passed - no test framework configured yet'
             }
         }
+
         stage('Build Docker Image') {
             steps {
-                dir('foodexpress-backend') {
-                    sh 'docker build -t foodexpress-api:latest .'
-                }
+                // Dockerfile is in the root folder
+                sh 'docker build -t foodexpress-api:latest .'
             }
         }
+
         stage('Deploy Container') {
             steps {
                 sh '''
-                    docker stop foodexpress || true
-                    docker rm foodexpress || true
-                    docker run -d --name foodexpress -p 3000:3000 foodexpress-api:latest
+                docker stop foodexpress || true
+                docker rm foodexpress || true
+                docker run -d -p 3000:3000 --name foodexpress foodexpress-api:latest
                 '''
             }
         }
+
     }
+
     post {
         success {
-            echo '✅ Deployment Successful!'
+            echo "✅ Pipeline completed successfully!"
         }
         failure {
-            echo '❌ Build Failed!'
+            echo "❌ Build Failed!"
         }
     }
 }
