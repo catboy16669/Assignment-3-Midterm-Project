@@ -29,6 +29,36 @@ app.get('/orders', (req, res) => {
   ]);
 });
 
+//  POST - Place a new order
+app.post('/orders', (req, res) => {
+  const { customer, item, quantity } = req.body;
+  res.status(201).json({
+    message: "Order placed successfully!",
+    orderId: Math.floor(Math.random() * 1000),
+    customer,
+    item,
+    quantity,
+    status: "Pending"
+  });
+});
+
+// PUT - Update an existing order status
+app.put('/orders/:id', (req, res) => {
+  const { status } = req.body;
+  res.json({
+    message: "Order updated successfully!",
+    orderId: req.params.id,
+    updatedStatus: status
+  });
+});
+
+//  DELETE - Cancel an order
+app.delete('/orders/:id', (req, res) => {
+  res.json({
+    message: `Order ${req.params.id} has been cancelled successfully!`
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`FoodExpress API running on port ${PORT}`);
 });
