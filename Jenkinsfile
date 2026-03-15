@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'docker-agent' } // <- change this to your Agent's label
+    agent { label 'MyAgent' } // <- change this to your Agent's label
 
     stages {
 
