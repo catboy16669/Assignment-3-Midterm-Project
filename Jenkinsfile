@@ -1,53 +1,47 @@
 pipeline {
-    agent { label 'MyAgent' } // <- change this to your Agent's label
-
+    agent { label 'MyAgent' }
+    
+    environment {
+        IMAGE_NAME = 'foodexpress-api'
+        CONTAINER_NAME = 'foodexpress'
+    }
+    
     stages {
-
         stage('Clone Repository') {
             steps {
+                echo 'Cloning repository...'
                 git branch: 'main', url: 'https://github.com/catboy16669/Assignment-3-Midterm-Project.git'
             }
         }
-
-        stage('Install Dependencies') {
-            steps {
-                // Run npm install in the root folder where package.json is
-                sh 'npm install'
-            }
-        }
-
-        stage('Run Tests') {
-            steps {
-                // If you have no test framework, just echo
-                sh 'echo Tests passed - no test framework configured yet'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
-                // Dockerfile is in the root folder
-                sh 'docker build -t foodexpress-api:latest .'
+                echo 'Building Docker image...'
+                sh 'docker build -t ${IMAGE_NAME}:latest .'
             }
         }
-
         stage('Deploy Container') {
             steps {
+                echo 'Deploying container...'
                 sh '''
-                docker stop foodexpress || true
-                docker rm foodexpress || true
-                docker run -d -p 3000:3000 --name foodexpress foodexpress-api:latest
+                    docker stop ${CONTAINER_NAME} || true
+                    docker rm ${CONTAINER_NAME} || true
+                    docker run -d -p 3000:3000 --name ${CONTAINER_NAME} ${IMAGE_NAME}:latest
                 '''
             }
         }
-
+        stage('Verify') {
+            steps {
+                echo 'Verifying container is running...'
+                sh 'docker ps | grep ${CONTAINER_NAME}'
+            }
+        }
     }
-
     post {
         success {
-            echo "✅ Pipeline completed successfully!"
+            echo "✅ Pipeline completed successfully! API running on port 3000"
         }
         failure {
-            echo "❌ Build Failed!"
+            echo "❌ Build Failed! Check logs above."
         }
     }
 }
